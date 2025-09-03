@@ -15,7 +15,7 @@ jobs:
         repo:
           - .github
           - .teamcity
-          - branding
+          # - branding (empty right now)
           - cache
           - codegen-kt
           - discord-objects
@@ -26,7 +26,7 @@ jobs:
           - kord-wiki
           - kordx.commands
           - kordx.emoji
-          - kordx.shard
+          # - kordx.shard (empty right now)
           - ktor
           - Lavalink.kt
           - setup-curl

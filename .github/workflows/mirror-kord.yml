@@ -3,14 +3,16 @@ name: Mirror Upstream Repository
 on:
   workflow_dispatch:
   schedule:
-    # (Every two hours)
-    - cron:  '7 */2 * * *'
+    # (Every hour)
+    - cron:  '7 */1 * * *'
 
 jobs:
   mirror:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
+
       matrix:
         repo:
           - .github

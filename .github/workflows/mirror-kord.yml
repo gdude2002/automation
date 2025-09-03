@@ -1,0 +1,55 @@
+name: Mirror Upstream Repository
+
+on:
+  workflow_dispatch:
+  schedule:
+    # (Every half hour)
+    - cron:  '7,37 * * * *'
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: "gdude-${{ github.workflow }}-mirror-${{ matrix.repo }}"
+      cancel-in-progress: true
+
+    strategy:
+      matrix:
+        repo:
+          - .github
+          - .teamcity
+          - branding
+          - cache
+          - codegen-kt
+          - discord-objects
+          - docker
+          - gradle-toools
+          - KETF
+          - kord
+          - kord-wiki
+          - kordx.commands
+          - kordx.emoji
+          - kordx.shard
+          - ktor
+          - Lavalink.kt
+          - setup-curl
+
+    steps:
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+
+          echo "${{ secrets.SSH_KEY }}" | base64 -d >> ~/.ssh/id_ed25519
+          echo "${{ secrets.SSH_KEY_PUB }}" >> ~/.ssh/id_ed25519.pub
+
+      - name: Clone upstream repository
+        run: git clone --mirror "https://github.com/kordlib/${{ matrix.repo }}.git" repo
+
+      - name: Filter out PR refs
+        working-directory: repo
+        run: git for-each-ref --format "%(refname)" "refs/pull/*/*" | while read entry; do git update-ref -d "$entry"; done
+
+      - name: Push to target repository
+        working-directory: repo
+        run: git push --mirror "ssh://git@codeberg.org/kord-mirror/${{ matrix.repo }}.git"
